@@ -1,13 +1,10 @@
+import { Outlet } from "react-router-dom";
 import "./App.css";
 
-function App() {
+export const App = () => {
   return (
-    <>
-      <h1 className="text-3xl font-bold underline text-cyan-400">
-        Hello world!
-      </h1>
-    </>
+    <div className="h-screen w-full m-0">
+      <Outlet />
+    </div>
   );
-}
-
-export default App;
+};
