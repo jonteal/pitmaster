@@ -7,6 +7,21 @@ export const Navbar = () => {
           Pit
         </Link>
       </div>
+      <nav className="navbar-center hidden lg:flex">
+        <ul className="menu menu-horizontal px-1">
+          <li>
+            <Link to="/">
+              <span className="text-xs font-mono mr-2">Home</span>
+            </Link>
+          </li>
+          <li>
+            <Link to="/add">
+              <span className="text-xs font-mono mr-2">Add</span>
+            </Link>
+          </li>
+        </ul>
+      </nav>
+      <div className="navbar-end"></div>
     </div>
   );
 };
