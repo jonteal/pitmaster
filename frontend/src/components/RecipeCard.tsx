@@ -1,6 +1,7 @@
 import { RecipeType } from "@/services/recipes/types";
 import { Card, CardContent, CardFooter, CardHeader } from "./ui/card";
 import { Link } from "react-router-dom";
+import { convertMinutesToHours } from "@/utils/Utilities";
 
 type RecipeCardProps = {
   recipe: RecipeType;
@@ -17,7 +18,7 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => (
             Servings: {recipe.servings}
           </span>
           <span className="text-sm text-gray-500">
-            Cooking Time: {recipe.cookingTime}
+            Cooking Time: {convertMinutesToHours(recipe.cookingTime)}
           </span>
         </div>
         <Link
