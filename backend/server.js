@@ -56,18 +56,66 @@ app.use("/api/recipes", recipeRoutes);
 
 async function initDB() {
   try {
+    await sql`DROP TABLE IF EXISTS recipe_tags`;
+    await sql`DROP TABLE IF EXISTS tags`;
+    await sql`DROP TABLE IF EXISTS recipe_steps`;
+    await sql`DROP TABLE IF EXISTS recipe_ingredients`;
+    await sql`DROP TABLE IF EXISTS ingredients`;
+    await sql`DROP TABLE IF EXISTS recipes`;
+
     await sql`
-        CREATE TABLE IF NOT EXISTS recipes (
-            id SERIAL PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            description VARCHAR(255) NOT NULL,
-            imageUrl VARCHAR(255),
-            servings DECIMAL(10,2) NOT NULL,
-            cookingTime DECIMAL(10,2) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-        `;
+  CREATE TABLE recipes (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    imageUrl TEXT,
+    servings INTEGER NOT NULL,
+    cookingTime INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )
+`;
+
+    await sql`
+  CREATE TABLE ingredients (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL
+  )
+`;
+
+    await sql`
+  CREATE TABLE recipe_ingredients (
+    id SERIAL PRIMARY KEY,
+    recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE,
+    ingredient_id INTEGER REFERENCES ingredients(id) ON DELETE CASCADE,
+    quantity VARCHAR(50),
+    unit VARCHAR(50)
+  )
+`;
+
+    await sql`
+  CREATE TABLE recipe_steps (
+    id SERIAL PRIMARY KEY,
+    recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE,
+    step_number INTEGER NOT NULL,
+    step_description TEXT NOT NULL
+  )
+`;
+
+    await sql`
+  CREATE TABLE tags (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+  )
+`;
+
+    await sql`
+  CREATE TABLE recipe_tags (
+    id SERIAL PRIMARY KEY,
+    recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE,
+    tag_id INTEGER REFERENCES tags(id) ON DELETE CASCADE
+  )
+`;
 
     console.log("database initialized successfully");
   } catch (error) {
