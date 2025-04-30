@@ -9,7 +9,7 @@ const api = axios.create({
 
 api.interceptors.response.use(
   function (response) {
-    return response.data;
+    return response.data.data;
   },
   function (error) {
     return Promise.reject(error);
@@ -19,7 +19,7 @@ api.interceptors.response.use(
 export const baseRecipeQueryKey = "recipe";
 
 export const useGetRecipes = () => {
-  useQuery<RecipeType[]>({
+  return useQuery<RecipeType[]>({
     queryKey: [baseRecipeQueryKey],
     queryFn: async () => api.get(""),
   });
