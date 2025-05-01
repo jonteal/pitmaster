@@ -8,7 +8,7 @@ import { ErrorPage } from "@/pages/ErrorPage";
 export const PageRouter = () => (
   <Routes>
     <Route index element={<Home />} />
-    <Route index element={<AddRecipe />} />
+    <Route path="/add" element={<AddRecipe />} />
     <Route path="recipe">
       <Route element={<RecipesLayout />}>
         <Route path=":recipeId" element={<RecipeDetails />} />

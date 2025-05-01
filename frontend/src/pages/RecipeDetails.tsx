@@ -1,4 +1,5 @@
 import { NameValuePair } from "@/components/NameValuePair";
+import { SkeletonCard } from "@/components/SkeletonCard";
 import { useGetRecipeById } from "@/services/recipes/recipeServiceHooks";
 import { convertMinutesToHours } from "@/utils/Utilities";
 import { useParams } from "react-router";
@@ -6,7 +7,11 @@ import { useParams } from "react-router";
 export const RecipeDetails = () => {
   const { recipeId } = useParams();
 
-  const { data: recipe } = useGetRecipeById(recipeId as string);
+  const { data: recipe, isLoading } = useGetRecipeById(recipeId as string);
+
+  if (isLoading) {
+    return <SkeletonCard />;
+  }
   return (
     <div>
       <NameValuePair type="heading" name="Name" value={recipe?.name || ""} />

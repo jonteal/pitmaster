@@ -4,10 +4,12 @@ import { useGetRecipes } from "@/services/recipes/recipeServiceHooks";
 export const RecipesHomeSection = () => {
   const { data: recipes, isLoading, isError } = useGetRecipes();
 
-  console.log("recipes: ", recipes);
-
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error loading recipes</div>;
   }
 
   return (

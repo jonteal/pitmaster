@@ -18,8 +18,8 @@ export const createRecipe = async (req, res) => {
   const {
     name,
     description,
-    imageUrl,
     servings,
+    imageUrl,
     cookingTime,
     ingredients,
     steps,
@@ -27,52 +27,128 @@ export const createRecipe = async (req, res) => {
   } = req.body;
 
   try {
-    const [recipe] = await sql`
-      INSERT INTO recipes (name, description, image_url, servings, cooking_time)
-      VALUES (${name}, ${description}, ${imageUrl}, ${servings}, ${cookingTime})
+    // 1. Insert into recipes table
+    const [newRecipe] = await sql`
+      INSERT INTO recipes (name, description, servings, image_url, cooking_time)
+      VALUES (${name}, ${description}, ${servings}, ${imageUrl}, ${cookingTime})
       RETURNING *
     `;
 
-    // Insert ingredients
-    for (const ing of ingredients) {
-      await sql`
-        INSERT INTO ingredients (recipe_id, name, quantity, unit)
-        VALUES (${recipe.id}, ${ing.name}, ${ing.quantity}, ${ing.unit})
-      `;
-    }
+    const recipeId = newRecipe.id;
 
-    // Insert steps
-    for (let i = 0; i < steps.length; i++) {
-      await sql`
-        INSERT INTO steps (recipe_id, step_number, description)
-        VALUES (${recipe.id}, ${i + 1}, ${steps[i].stepDescription})
-      `;
-    }
-
-    // Insert tags
-    for (const tagName of tags) {
-      // check if tag exists, insert if not
-      const existing = await sql`SELECT id FROM tags WHERE name = ${tagName}`;
-      let tagId;
-
-      if (existing.length === 0) {
-        const [newTag] =
-          await sql`INSERT INTO tags (name) VALUES (${tagName}) RETURNING id`;
-        tagId = newTag.id;
-      } else {
-        tagId = existing[0].id;
+    // 2. Insert ingredients one by one
+    if (ingredients && ingredients.length > 0) {
+      for (const i of ingredients) {
+        await sql`
+          INSERT INTO ingredients (name, quantity, unit, recipe_id)
+          VALUES (${i.name}, ${i.quantity}, ${i.unit}, ${recipeId})
+        `;
       }
-
-      // link to recipe
-      await sql`INSERT INTO recipe_tags (recipe_id, tag_id) VALUES (${recipe.id}, ${tagId})`;
     }
 
-    res.status(201).json({ success: true, data: keysToCamel(recipe) });
+    // 3. Insert steps one by one
+    if (steps && steps.length > 0) {
+      for (let i = 0; i < steps.length; i++) {
+        const s = steps[i];
+        await sql`
+          INSERT INTO steps (description, step_number, recipe_id)
+          VALUES (${s.description}, ${s.stepNumber ?? i + 1}, ${recipeId})
+        `;
+      }
+    }
+
+    // 4. Insert tags and join table
+    if (tags && tags.length > 0) {
+      for (const tagName of tags) {
+        let tagId;
+        const [existingTag] = await sql`
+          SELECT id FROM tags WHERE name = ${tagName}
+        `;
+        if (existingTag) {
+          tagId = existingTag.id;
+        } else {
+          const [newTag] = await sql`
+            INSERT INTO tags (name) VALUES (${tagName}) RETURNING id
+          `;
+          tagId = newTag.id;
+        }
+
+        await sql`
+          INSERT INTO recipe_tags (recipe_id, tag_id)
+          VALUES (${recipeId}, ${tagId})
+        `;
+      }
+    }
+
+    res.status(201).json({
+      success: true,
+      data: keysToCamel(newRecipe),
+    });
   } catch (error) {
     console.error("Error creating recipe:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
+
+// export const createRecipe = async (req, res) => {
+//   const {
+//     name,
+//     description,
+//     imageUrl,
+//     servings,
+//     cookingTime,
+//     ingredients,
+//     steps,
+//     tags,
+//   } = req.body;
+
+//   try {
+//     const [recipe] = await sql`
+//       INSERT INTO recipes (name, description, image_url, servings, cooking_time)
+//       VALUES (${name}, ${description}, ${imageUrl}, ${servings}, ${cookingTime})
+//       RETURNING *
+//     `;
+
+//     // Insert ingredients
+//     for (const ing of ingredients) {
+//       await sql`
+//         INSERT INTO ingredients (recipe_id, name, quantity, unit)
+//         VALUES (${recipe.id}, ${ing.name}, ${ing.quantity}, ${ing.unit})
+//       `;
+//     }
+
+//     // Insert steps
+//     for (let i = 0; i < steps.length; i++) {
+//       await sql`
+//         INSERT INTO steps (recipe_id, step_number, description)
+//         VALUES (${recipe.id}, ${i + 1}, ${steps[i].stepDescription})
+//       `;
+//     }
+
+//     // Insert tags
+//     for (const tagName of tags) {
+//       // check if tag exists, insert if not
+//       const existing = await sql`SELECT id FROM tags WHERE name = ${tagName}`;
+//       let tagId;
+
+//       if (existing.length === 0) {
+//         const [newTag] =
+//           await sql`INSERT INTO tags (name) VALUES (${tagName}) RETURNING id`;
+//         tagId = newTag.id;
+//       } else {
+//         tagId = existing[0].id;
+//       }
+
+//       // link to recipe
+//       await sql`INSERT INTO recipe_tags (recipe_id, tag_id) VALUES (${recipe.id}, ${tagId})`;
+//     }
+
+//     res.status(201).json({ success: true, data: keysToCamel(recipe) });
+//   } catch (error) {
+//     console.error("Error creating recipe:", error);
+//     res.status(500).json({ success: false, message: "Internal Server Error" });
+//   }
+// };
 
 export const getRecipe = async (req, res) => {
   const { id } = req.params;
