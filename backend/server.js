@@ -57,64 +57,56 @@ app.use("/api/recipes", recipeRoutes);
 async function initDB() {
   try {
     await sql`DROP TABLE IF EXISTS recipe_tags`;
-    await sql`DROP TABLE IF EXISTS tags`;
-    await sql`DROP TABLE IF EXISTS recipe_steps`;
-    await sql`DROP TABLE IF EXISTS recipe_ingredients`;
     await sql`DROP TABLE IF EXISTS ingredients`;
+    await sql`DROP TABLE IF EXISTS steps`;
+    await sql`DROP TABLE IF EXISTS tags`;
     await sql`DROP TABLE IF EXISTS recipes`;
 
     await sql`
   CREATE TABLE recipes (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
-    imageUrl TEXT,
-    servings INTEGER NOT NULL,
-    cookingTime INTEGER NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  )
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  description TEXT,
+  imageUrl TEXT,
+  servings INTEGER,
+  cookingTime INTEGER,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 `;
 
     await sql`
-  CREATE TABLE ingredients (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) UNIQUE NOT NULL
-  )
+CREATE TABLE ingredients (
+  id SERIAL PRIMARY KEY,
+  recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  quantity TEXT,
+  unit TEXT
+);
 `;
 
     await sql`
-  CREATE TABLE recipe_ingredients (
-    id SERIAL PRIMARY KEY,
-    recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE,
-    ingredient_id INTEGER REFERENCES ingredients(id) ON DELETE CASCADE,
-    quantity VARCHAR(50),
-    unit VARCHAR(50)
-  )
+CREATE TABLE steps (
+  id SERIAL PRIMARY KEY,
+  recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE,
+  step_number INTEGER NOT NULL,
+  description TEXT NOT NULL
+);
 `;
 
     await sql`
-  CREATE TABLE recipe_steps (
-    id SERIAL PRIMARY KEY,
-    recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE,
-    step_number INTEGER NOT NULL,
-    step_description TEXT NOT NULL
-  )
+CREATE TABLE tags (
+  id SERIAL PRIMARY KEY,
+  name TEXT UNIQUE NOT NULL
+);
 `;
 
     await sql`
-  CREATE TABLE tags (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL
-  )
-`;
-
-    await sql`
-  CREATE TABLE recipe_tags (
-    id SERIAL PRIMARY KEY,
-    recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE,
-    tag_id INTEGER REFERENCES tags(id) ON DELETE CASCADE
-  )
+CREATE TABLE recipe_tags (
+  id SERIAL PRIMARY KEY,
+  recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE,
+  tag_id INTEGER REFERENCES tags(id) ON DELETE CASCADE
+);
 `;
 
     console.log("database initialized successfully");
