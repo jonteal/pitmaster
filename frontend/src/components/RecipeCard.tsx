@@ -23,7 +23,7 @@ export const RecipeCard = ({ recipe }: RecipeCardProps) => (
         </div>
         <Link
           className="mt-4 inline-block btn btn-primary py-2 px-4 rounded"
-          to={`/recipe/${recipe.recipeId}`}
+          to={`/recipe/${recipe.id}`}
         >
           View Recipe
         </Link>

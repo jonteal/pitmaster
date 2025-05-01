@@ -24,3 +24,10 @@ export const useGetRecipes = () => {
     queryFn: async () => api.get(""),
   });
 };
+
+export const useGetRecipeById = (recipeId: string) => {
+  return useQuery<RecipeType>({
+    queryKey: [baseRecipeQueryKey, recipeId],
+    queryFn: async () => api.get(`/${recipeId}`),
+  });
+};

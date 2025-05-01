@@ -37,7 +37,7 @@ export const getRecipe = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const recipe = sql`
+    const recipe = await sql`
         SELECT * FROM recipes WHERE id=${id}
         `;
 

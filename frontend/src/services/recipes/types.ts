@@ -11,7 +11,7 @@ type StepType = {
 };
 
 export type RecipeType = {
-  recipeId: number;
+  id: number;
   name: string;
   description: string;
   ingredients: IngredientType[];

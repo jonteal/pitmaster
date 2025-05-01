@@ -13,7 +13,7 @@ export const RecipesHomeSection = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
       {recipes?.map((recipe) => (
-        <div key={recipe.recipeId}>
+        <div key={recipe.id}>
           <RecipeCard recipe={recipe} />
         </div>
       ))}
