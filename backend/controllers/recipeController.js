@@ -1,4 +1,17 @@
 import { sql } from "../config/db.js";
+import { keysToCamel } from "../utils/utils.js";
+
+const formatRecipe = (recipe) => ({
+  id: recipe.id,
+  name: recipe.name,
+  description: recipe.description,
+  imageUrl: recipe.image_url,
+  servings: recipe.servings,
+  cookingTime: recipe.cooking_time,
+  createdAt: recipe.created_at,
+  updatedAt: recipe.updated_at,
+});
+
 export const getRecipes = async (req, res) => {
   try {
     const recipes = await sql`
@@ -6,7 +19,7 @@ export const getRecipes = async (req, res) => {
         ORDER BY created_at DESC
         `;
     console.log("fetched recipes: ", recipes);
-    res.status(200).json({ success: true, data: recipes });
+    res.status(200).json({ success: true, data: keysToCamel(recipes) });
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
@@ -26,7 +39,7 @@ export const createRecipe = async (req, res) => {
 
   try {
     const [recipe] = await sql`
-      INSERT INTO recipes (name, description, imageUrl, servings, cookingTime)
+      INSERT INTO recipes (name, description, image_url, servings, cooking_time)
       VALUES (${name}, ${description}, ${imageUrl}, ${servings}, ${cookingTime})
       RETURNING *
     `;
@@ -65,7 +78,7 @@ export const createRecipe = async (req, res) => {
       await sql`INSERT INTO recipe_tags (recipe_id, tag_id) VALUES (${recipe.id}, ${tagId})`;
     }
 
-    res.status(201).json({ success: true, data: recipe });
+    res.status(201).json({ success: true, data: keysToCamel(recipe) });
   } catch (error) {
     console.error("Error creating recipe:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -136,12 +149,12 @@ export const getRecipe = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: {
+      data: keysToCamel({
         ...recipe,
         ingredients,
         steps,
         tags: tags.map((t) => t.name),
-      },
+      }),
     });
   } catch (error) {
     console.error("Error in getRecipe: ", error);

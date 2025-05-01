@@ -56,6 +56,7 @@ app.use("/api/recipes", recipeRoutes);
 
 async function initDB() {
   try {
+    // Uncomment the following lines to drop the tables if they exist
     await sql`DROP TABLE IF EXISTS recipe_tags`;
     await sql`DROP TABLE IF EXISTS ingredients`;
     await sql`DROP TABLE IF EXISTS steps`;
@@ -67,9 +68,9 @@ async function initDB() {
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT,
-  imageUrl TEXT,
+  image_url TEXT,
   servings INTEGER,
-  cookingTime INTEGER,
+  cooking_time INTEGER,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
