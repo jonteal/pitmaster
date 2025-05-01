@@ -1,17 +1,6 @@
 import { sql } from "../config/db.js";
 import { keysToCamel } from "../utils/utils.js";
 
-const formatRecipe = (recipe) => ({
-  id: recipe.id,
-  name: recipe.name,
-  description: recipe.description,
-  imageUrl: recipe.image_url,
-  servings: recipe.servings,
-  cookingTime: recipe.cooking_time,
-  createdAt: recipe.created_at,
-  updatedAt: recipe.updated_at,
-});
-
 export const getRecipes = async (req, res) => {
   try {
     const recipes = await sql`
@@ -85,43 +74,6 @@ export const createRecipe = async (req, res) => {
   }
 };
 
-// export const createRecipe = async (req, res) => {
-//   const { name, description, imageUrl, servings, cookingTime } = req.body;
-
-//   if (!name || !description || !servings || !cookingTime) {
-//     return res
-//       .status(400)
-//       .json({ success: false, message: "All fields are required :)" });
-//   }
-
-//   try {
-//     const newRecipe = await sql`
-//     INSERT INTO recipes (name, description, servings, cookingTime, imageUrl)
-//     VALUES (${name}, ${description}, ${servings}, ${cookingTime}, ${imageUrl})
-//     RETURNING *
-//     `;
-
-//     console.log("new recipe added: ", newRecipe);
-//     res.status(201).json({ success: true, data: newRecipe[0] });
-//   } catch (error) {
-//     console.log("Error in createRecipe function", error);
-//   }
-// };
-// export const getRecipe = async (req, res) => {
-//   const { id } = req.params;
-
-//   try {
-//     const recipe = await sql`
-//         SELECT * FROM recipes WHERE id=${id}
-//         `;
-
-//     res.status(200).json({ success: true, data: recipe[0] });
-//   } catch (error) {
-//     console.log("Error in getRecipe function: ", error);
-//     res.status(500).json({ success: false, message: "Internal Server Error" });
-//   }
-// };
-
 export const getRecipe = async (req, res) => {
   const { id } = req.params;
 
@@ -181,9 +133,9 @@ export const updateRecipe = async (req, res) => {
       UPDATE recipes
       SET name = ${name},
           description = ${description},
-          imageUrl = ${imageUrl},
+          image_url = ${imageUrl},
           servings = ${servings},
-          cookingTime = ${cookingTime},
+          cooking_time = ${cookingTime},
           updated_at = NOW()
       WHERE id = ${id}
     `;
@@ -238,31 +190,6 @@ export const updateRecipe = async (req, res) => {
   }
 };
 
-// export const updateRecipe = async (req, res) => {
-//   const { id } = req.params;
-//   const { name, description, imageUrl, servings, cookingTime } = req.body;
-
-//   try {
-//     const updatedRecipe = await sql`
-//     UPDATE recipes
-//     SET name=${name}, description=${description}, imageUrl=${imageUrl}, servings=${servings}, cookingTime=${cookingTime}
-//     WHERE id=${id}
-//     RETURNING *
-//     `;
-
-//     if (updatedRecipe.length === 0) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Recipe not found",
-//       });
-//     }
-
-//     res.status(200).json({ success: true, data: updateRecipe[0] });
-//   } catch (error) {
-//     console.log("Error in updateRecipe function: ", error);
-//     res.status(500).json({ success: false, message: "Internal Server Error" });
-//   }
-// };
 export const deleteRecipe = async (req, res) => {
   const { id } = req.params;
 

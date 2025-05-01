@@ -57,11 +57,11 @@ app.use("/api/recipes", recipeRoutes);
 async function initDB() {
   try {
     // Uncomment the following lines to drop the tables if they exist
-    await sql`DROP TABLE IF EXISTS recipe_tags`;
-    await sql`DROP TABLE IF EXISTS ingredients`;
-    await sql`DROP TABLE IF EXISTS steps`;
-    await sql`DROP TABLE IF EXISTS tags`;
-    await sql`DROP TABLE IF EXISTS recipes`;
+    // await sql`DROP TABLE IF EXISTS recipe_tags`;
+    // await sql`DROP TABLE IF EXISTS ingredients`;
+    // await sql`DROP TABLE IF EXISTS steps`;
+    // await sql`DROP TABLE IF EXISTS tags`;
+    // await sql`DROP TABLE IF EXISTS recipes`;
 
     await sql`
   CREATE TABLE recipes (
