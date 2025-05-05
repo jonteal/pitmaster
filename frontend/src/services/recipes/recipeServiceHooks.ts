@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { RecipeFormType, RecipeType } from "./types";
 import { api } from "../api";
+import { on } from "events";
 
 // const baseURL = "http://localhost:3000/api/recipes";
 
@@ -28,6 +29,43 @@ export const useAddRecipe = ({ onSuccess }: { onSuccess: () => void }) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [baseRecipeQueryKey] });
       onSuccess();
+    },
+  });
+};
+
+export const useUpdateRecipe = ({ onSuccess }: { onSuccess: () => void }) => {
+  const queryClient = useQueryClient();
+  return useMutation<RecipeType, Error, RecipeType>({
+    mutationFn: async (updatedRecipe: RecipeType) =>
+      api.put(`/${updatedRecipe.id}`, updatedRecipe),
+    onSuccess: (_, updatedRecipe) => {
+      queryClient.invalidateQueries({
+        queryKey: [baseRecipeQueryKey],
+        exact: true,
+      });
+      queryClient.invalidateQueries({
+        queryKey: [`${baseRecipeQueryKey}-${updatedRecipe.id}`],
+        exact: true,
+      });
+      onSuccess();
+    },
+  });
+};
+
+export const useDeleteRecipe = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<string, Error, string>({
+    mutationFn: async (recipeId: string) => api.delete(`/${recipeId}`),
+    onSuccess: (_, recipeId) => {
+      queryClient.invalidateQueries({
+        queryKey: [baseRecipeQueryKey],
+        exact: true,
+      });
+      queryClient.removeQueries({
+        queryKey: [`${baseRecipeQueryKey}-${recipeId}`],
+        exact: true,
+      });
     },
   });
 };
