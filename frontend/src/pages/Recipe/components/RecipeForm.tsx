@@ -21,7 +21,7 @@ import { useState } from "react";
 import { Form, FormProvider, useFieldArray, useForm } from "react-hook-form";
 
 type RecipeFormProps = {
-  onSubmit: (data: RecipeFormType) => void;
+  onSubmit: (data: RecipeFormType | RecipeType) => void;
   recipe?: Partial<RecipeType>;
 };
 
